@@ -3297,10 +3297,25 @@
      ------------------------------------------------------------ */
   @media (max-width: 768px) {
     .slide {
-      padding: 32px 22px 64px 22px;
+      padding: 28px 22px 78px 22px;
+      align-items: flex-start;
+      justify-content: flex-start;
+    }
+    /* On mobile, let the active slide scroll vertically when its content
+       exceeds the viewport. Nav arrows are position:fixed and stay in place. */
+    .slide.is-active {
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
     .slide-inner {
       max-width: 100%;
+    }
+    /* Pin the slide's background photo to the viewport so it doesn't scroll
+       off the top with the content. */
+    .slide .photo-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
     }
 
     /* Headlines + body */
@@ -4204,7 +4219,11 @@
       function pad(n) { return n < 10 ? '0' + n : String(n); }
 
       function render() {
-        slides.forEach((s, i) => s.classList.toggle('is-active', i === current));
+        slides.forEach((s, i) => {
+          s.classList.toggle('is-active', i === current);
+          // Reset scroll so the next slide always starts at the top (mobile)
+          if (i === current && s.scrollTop) s.scrollTop = 0;
+        });
         counter.textContent = pad(current + 1) + ' / ' + pad(total);
         progressFill.style.width = ((current + 1) / total * 100) + '%';
         if (navPrev) navPrev.toggleAttribute('disabled', current === 0);
